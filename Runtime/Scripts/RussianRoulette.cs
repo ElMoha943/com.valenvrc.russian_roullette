@@ -1,9 +1,12 @@
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
+using VRC.SDK3.Components;
 using VRC.SDKBase;
 
 namespace valenvrc.RussianRoulette{
-    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync),Icon("Packages/com.valenvrc.russian_roullette/Editor/Resources/RevolverIcon.png"), HelpURL("https://discord.gg/nv5ax3wDqc")]
+    [RequireComponent(typeof(AudioSource))]
+    [RequireComponent(typeof(VRCPickup))]
     public class RussianRoulette : UdonSharpBehaviour
     {
         [SerializeField, Tooltip("1 in x chances of shooting")] int chances = 6;
@@ -18,7 +21,7 @@ namespace valenvrc.RussianRoulette{
 
         void Start(){
             audioSource = GetComponent<AudioSource>();
-            if(TPPoint == null){
+            if (TPPoint == null){
                 TPPoint = transform;
             }
             localPlayer = Networking.LocalPlayer;
@@ -27,15 +30,13 @@ namespace valenvrc.RussianRoulette{
 
         public override void OnPickupUseDown(){
             if (Random.Range(0, chances) == 0){
-                Shot();
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Shot");
-                if(shouldTeleport){
+                if (shouldTeleport){
                     Networking.LocalPlayer.TeleportTo(TPPoint.position, TPPoint.rotation);
                 }
             }
             else{
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Empty");
-                Empty();
             }
         }
 
@@ -54,3 +55,4 @@ namespace valenvrc.RussianRoulette{
         }
     }
 }
+
