@@ -1,0 +1,26 @@
+name: Publish Package
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+
+  publish:
+    uses: ElMoha943/github-workflows/.github/workflows/release-package.yml@master
+
+  update-listing:
+    needs: publish
+
+    uses: ElMoha943/github-workflows/.github/workflows/update-package-listing.yml@master
+
+    with:
+      version: ${{ needs.publish.outputs.version }}
+
+    secrets:
+      LISTING_TOKEN: ${{ secrets.LISTING_TOKEN }}
